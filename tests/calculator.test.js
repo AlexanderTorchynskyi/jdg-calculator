@@ -61,13 +61,24 @@ test('effective defaults affect unsaved months and never replace saved snapshots
   const changed = { ...first, month: '2026-04', rate: 20_000, zus: 300_000 };
   const savedFuture = { ...first, month: '2026-06', hours: 12_000 };
   const workspace = { revision: 2, records: [first, savedFuture], defaults: [first, changed] };
-  assert.equal(selectMonth(workspace, '2025-12').values.rate, '');
+  assert.equal(selectMonth(workspace, '2025-12').values.rate, '100.00');
   assert.equal(selectMonth(workspace, '2026-03').values.rate, '100.00');
   assert.equal(selectMonth(workspace, '2026-05').values.rate, '200.00');
   assert.equal(selectMonth(workspace, '2026-05').values.zus, '3000.00');
   assert.equal(selectMonth(workspace, '2026-06').values.rate, '100.00');
   assert.equal(selectMonth(workspace, '2026-06').values.hours, '120.00');
   assert.equal(selectMonth(workspace, '2026-05').saved, false);
+});
+
+test('every fresh month prefills an editable PLN 100 rate without marking it saved', () => {
+  for (const month of ['2025-01', '2026-11', '2027-12']) {
+    const selected = selectMonth(emptyWorkspace(), month);
+    assert.equal(selected.values.rate, '100.00');
+    assert.equal(selected.values.hours, '');
+    assert.equal(selected.saved, false);
+  }
+  const saved = { month: '2026-11', ...sample({ rate: '80' }) };
+  assert.equal(selectMonth({ revision: 1, records: [saved], defaults: [] }, saved.month).values.rate, '80.00');
 });
 
 test('workspace rejects malformed backend records rather than using silent defaults', () => {

@@ -8,7 +8,7 @@ export const FIELDS = {
 };
 
 export const SETTINGS = ['rate', 'tax', 'accounting', 'card', 'zus'];
-export const DEFAULTS = { rate: '', tax: '10.50', accounting: '299.00', card: '9.00', zus: '2619.00' };
+export const DEFAULTS = { rate: '100.00', tax: '10.50', accounting: '299.00', card: '9.00', zus: '2619.00' };
 
 export function parseHundredths(value, field) {
   const text = String(value).trim().replace(',', '.');
