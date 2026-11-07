@@ -64,9 +64,11 @@ h2 { font-size: 1.06rem; font-weight: 600; margin-bottom: 0; letter-spacing: -.2
 .field label { font-size: .78rem; font-weight: 550; display: block; margin-bottom: 9px; }
 .label-hint { color: var(--muted); font-size: .67rem; font-weight: 400; margin-left: 4px; }
 .input-with-unit { display: flex; align-items: center; border: 1px solid #d9e1d7; border-radius: 9px; background: #fafbf8; }
-.input-with-unit:focus-within { border-color: #509a77; }
+.input-with-unit:focus-within { border-color: #509a77; outline: 2px solid #509a77; outline-offset: 1px; }
 .input-with-unit input { background: transparent; width: 100%; min-width: 0; border: 0; border-radius: 9px; padding: 14px; font-size: 1.1rem; color: var(--green); font-weight: 550; }
-.input-with-unit span { color: var(--muted); font-size: .7rem; padding-right: 14px; }
+.input-with-unit input:focus, .input-with-unit input[aria-invalid="true"] { outline: none; }
+.input-with-unit:has(input[aria-invalid="true"]) { border-color: #ad4b40; outline: 1px solid #ad4b40; }
+.input-with-unit span { flex-shrink: 0; color: var(--muted); font-size: .7rem; padding-right: 14px; }
 input::placeholder { color: #9aa69c; font-weight: 400; font-size: .9rem; }
 .multiply { color: #93a28e; text-align: center; padding-top: 40px; font-size: 1.3rem; }
 .field-error { font-size: .7rem; color: #a22f2f; margin: 7px 0 0; line-height: 1.5; }

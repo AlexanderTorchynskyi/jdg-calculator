@@ -99,6 +99,36 @@ test('unsaved preview is responsive, accessible and calculates the exact formula
   await expect(page.locator('#rate-error')).toContainText('non-negative');
   await expect(page.locator('#brutto')).toHaveText('—');
   await expect(page.locator('#rate')).toHaveAttribute('aria-invalid', 'true');
+  for (const field of ['hours', 'rate', 'tax', 'accounting', 'card', 'zus']) {
+    const input = page.locator(`#${field}`);
+    await input.fill(field === 'tax' ? '10.25' : '100');
+    await input.focus();
+    const geometry = await input.evaluate((element) => {
+      const wrapper = element.parentElement;
+      const unit = wrapper.querySelector('span');
+      const inputBox = element.getBoundingClientRect();
+      const unitBox = unit.getBoundingClientRect();
+      const wrapperBox = wrapper.getBoundingClientRect();
+      return {
+        inputOutline: getComputedStyle(element).outlineStyle,
+        wrapperOutline: getComputedStyle(wrapper).outlineStyle,
+        wrapperOutlineWidth: getComputedStyle(wrapper).outlineWidth,
+        inputRight: inputBox.right,
+        unitLeft: unitBox.left,
+        unitRight: unitBox.right,
+        wrapperRight: wrapperBox.right,
+      };
+    });
+    expect(geometry.inputOutline).toBe('none');
+    expect(geometry.wrapperOutline).toBe('solid');
+    expect(geometry.wrapperOutlineWidth).toBe('2px');
+    expect(geometry.inputRight).toBeLessThanOrEqual(geometry.unitLeft + 0.5);
+    expect(geometry.unitRight).toBeLessThanOrEqual(geometry.wrapperRight);
+  }
+  await page.locator('#rate').fill('-1');
+  await expect(page.locator('#rate')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#rate')).toHaveCSS('outline-style', 'none');
+  await expect(page.locator('#rate').locator('..')).toHaveCSS('outline-color', 'rgb(173, 75, 64)');
   await noOverflow(page);
   expect(errors).toEqual([]);
 });
