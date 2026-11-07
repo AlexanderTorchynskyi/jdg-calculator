@@ -83,10 +83,10 @@ test('unsaved preview is responsive, accessible and calculates the exact formula
   await page.goto('/');
   await expect(page.locator('#setup-notice')).toBeVisible();
   await expect(page.locator('#save')).toBeDisabled();
-  await expect(page.locator('#rate')).toHaveValue('155.00');
+  await expect(page.locator('#rate')).toHaveValue('');
   await page.getByLabel('Working hours').fill('160');
-  await expect(page.locator('#brutto')).toContainText('30,504.00 PLN');
-  await expect(page.locator('#netto')).toContainText('19,269.00 PLN');
+  await expect(page.locator('#brutto')).toHaveText('—');
+  await expect(page.locator('#netto')).toHaveText('—');
   await page.getByLabel('Hourly rate').fill('100');
   await expect(page.locator('#brutto')).toContainText('19,680.00 PLN');
   await expect(page.locator('#netto')).toContainText('11,393.00 PLN');
@@ -107,7 +107,7 @@ test('monthly snapshots survive reload and sync to another device; defaults pres
   const { state } = await mockBackend(context);
   await login(page);
   await month(page, '2026-01');
-  await expect(page.locator('#rate')).toHaveValue('155.00');
+  await expect(page.locator('#rate')).toHaveValue('');
   await expect(page.locator('#save-state')).toHaveText('Not saved yet');
   await page.getByLabel('Working hours').fill('160');
   await page.getByLabel('Hourly rate').fill('100');
@@ -166,7 +166,7 @@ test('failed and conflicting saves keep edits; explicit refresh and discard are 
   page.once('dialog', (dialog) => dialog.accept());
   await page.getByRole('button', { name: 'Refresh', exact: true }).click();
   await expect(page.locator('#app-status')).toHaveText('Up to date.');
-  await expect(page.locator('#rate')).toHaveValue('155.00');
+  await expect(page.locator('#rate')).toHaveValue('');
 });
 
 test('authentication supports signup, reset requests, sign-in and clean sign-out', async ({ page, context }, testInfo) => {

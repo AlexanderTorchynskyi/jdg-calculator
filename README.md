@@ -50,7 +50,7 @@ tax    = base × income-tax percentage
 netto  = base − tax − accounting − card support − ZUS
 ```
 
-Defaults: hourly rate **155 PLN**, income tax **10.5%**, accounting **299 PLN**, card support **9 PLN**, ZUS **2619 PLN**. The hourly rate is prefilled and remains editable. Everything except VAT is editable. VAT does not enter the take-home tax base.
+Defaults: income tax **10.5%**, accounting **299 PLN**, card support **9 PLN**, ZUS **2619 PLN**. There is no predefined hourly rate; enter it once and save to carry it forward. Everything except VAT is editable. VAT does not enter the take-home tax base.
 
 Inputs accept a dot or comma decimal separator, with up to two decimal places. Hours can be fractional or zero; negative netto is retained. Base earnings, VAT, and tax are rounded half-up to grosz using integer arithmetic; totals are derived from those rounded components so the breakdown reconciles.
 
@@ -62,7 +62,7 @@ Supported input limits: 10,000 working hours per month, 10,000,000 PLN for each 
 
 - Choose a month, enter hours, and use **Save month**. Edits are calculated immediately but are not automatically saved.
 - Each saved month contains its own hours, hourly rate, tax, and fee snapshot. Opening it restores those exact inputs.
-- A new, unsaved month uses the most recent default settings effective on or before that month. Before the first saved defaults, the built-in defaults apply, including an hourly rate of 155 PLN. Saved or inherited hourly rates take precedence over this starting rate.
+- A new, unsaved month uses the most recent default settings effective on or before that month. Before the first saved defaults, the built-in deduction defaults apply and the hourly rate is blank. Saved and inherited hourly rates remain unchanged.
 - Saving changed settings makes them effective from the selected month. They carry forward until a later dated settings change. Existing saved months are never rewritten by default changes.
 - Saving only hours does not create an additional defaults version.
 - Month changes, refresh, and sign-out prompt before discarding edits. Reload/close warnings depend on the browser; browsers cannot guarantee protection from crashes or forced shutdowns. Unsaved drafts are not stored.
