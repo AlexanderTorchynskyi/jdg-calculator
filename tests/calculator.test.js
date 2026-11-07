@@ -7,9 +7,9 @@ const sample = (values = {}) => validateInputs({ hours: '160', ...DEFAULTS, rate
 
 test('exact custom formula: 160 hours at PLN 100', () => {
   assert.deepEqual(calculate(sample()), {
-    base: 1_600_000n, vat: 368_000n, tax: 168_000n,
+    base: 1_600_000n, vat: 368_000n, tax: 164_000n,
     accounting: 29_900n, card: 900n, zus: 261_900n,
-    brutto: 1_968_000n, netto: 1_139_300n,
+    brutto: 1_968_000n, netto: 1_143_300n,
   });
 });
 
@@ -85,6 +85,15 @@ test('working hours alone cannot produce earnings without an hourly rate', () =>
   const result = validateInputs({ ...DEFAULTS, hours: '160' });
   assert.equal(result.valid, false);
   assert.ok(result.errors.rate);
+});
+
+test('built-in tax is 10.25% without overwriting saved or inherited tax', () => {
+  assert.equal(selectMonth(emptyWorkspace(), '2026-11').values.tax, '10.25');
+  const record = { month: '2026-01', ...sample({ tax: '10.50' }) };
+  const workspace = { revision: 1, records: [record], defaults: [record] };
+  assert.equal(selectMonth(workspace, '2025-12').values.tax, '10.25');
+  assert.equal(selectMonth(workspace, '2026-01').values.tax, '10.50');
+  assert.equal(selectMonth(workspace, '2026-02').values.tax, '10.50');
 });
 
 test('workspace rejects malformed backend records rather than using silent defaults', () => {

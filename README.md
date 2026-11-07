@@ -50,11 +50,11 @@ tax    = base × income-tax percentage
 netto  = base − tax − accounting − card support − ZUS
 ```
 
-Defaults: income tax **10.5%**, accounting **299 PLN**, card support **9 PLN**, ZUS **2619 PLN**. There is no predefined hourly rate; enter it once and save to carry it forward. Everything except VAT is editable. VAT does not enter the take-home tax base.
+Defaults: income tax **10.25%**, accounting **299 PLN**, card support **9 PLN**, ZUS **2619 PLN**. There is no predefined hourly rate; enter it once and save to carry it forward. Everything except VAT is editable. VAT does not enter the take-home tax base. Saved or inherited tax settings take precedence over the built-in default.
 
 Inputs accept a dot or comma decimal separator, with up to two decimal places. Hours can be fractional or zero; negative netto is retained. Base earnings, VAT, and tax are rounded half-up to grosz using integer arithmetic; totals are derived from those rounded components so the breakdown reconciles.
 
-For example, 160 hours at 100 PLN/hour produces base earnings of 16,000 PLN, brutto of **19,680 PLN**, and netto of **11,393 PLN** with the default deductions.
+For example, 160 hours at 100 PLN/hour produces base earnings of 16,000 PLN, brutto of **19,680 PLN**, and netto of **11,433 PLN** with the default deductions.
 
 Supported input limits: 10,000 working hours per month, 10,000,000 PLN for each monetary input, and income tax between 0% and 100%. Months must be between January 1000 and December 9999. These are storage/validation bounds, not payroll recommendations.
 

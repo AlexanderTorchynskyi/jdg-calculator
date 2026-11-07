@@ -84,14 +84,15 @@ test('unsaved preview is responsive, accessible and calculates the exact formula
   await expect(page.locator('#setup-notice')).toBeVisible();
   await expect(page.locator('#save')).toBeDisabled();
   await expect(page.locator('#rate')).toHaveValue('');
+  await expect(page.locator('#tax')).toHaveValue('10.25');
   await page.getByLabel('Working hours').fill('160');
   await expect(page.locator('#brutto')).toHaveText('—');
   await expect(page.locator('#netto')).toHaveText('—');
   await page.getByLabel('Hourly rate').fill('100');
   await expect(page.locator('#brutto')).toContainText('19,680.00 PLN');
-  await expect(page.locator('#netto')).toContainText('11,393.00 PLN');
+  await expect(page.locator('#netto')).toContainText('11,433.00 PLN');
   await page.getByLabel('ZUS', { exact: true }).fill('3000');
-  await expect(page.locator('#netto')).toContainText('11,012.00 PLN');
+  await expect(page.locator('#netto')).toContainText('11,052.00 PLN');
   await page.getByLabel('Working hours').fill('0');
   await expect(page.locator('#netto')).toContainText('-3,308.00 PLN');
   await page.getByLabel('Hourly rate').fill('-1');
