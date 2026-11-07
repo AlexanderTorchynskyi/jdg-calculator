@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#163e32">
+    <meta name="description" content="Your monthly JDG earnings, VAT, and take-home estimate in one clear view.">
+    <title>Monthline — JDG earnings</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Monthline home"><span class="brand-mark" aria-hidden="true">m.</span> monthline<span class="brand-tag">JDG</span></a>
+      <div class="account">
+        <span id="account-email"></span>
+        <button id="sign-out" class="button subtle" hidden>Sign out</button>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section id="setup-notice" class="notice" hidden aria-labelledby="setup-title">
+        <h2 id="setup-title">Connect your workspace</h2>
+        <p id="setup-message">This is an unsaved preview. Add your Supabase public configuration to enable login, permanent storage, and cross-device sync. See the README for setup instructions.</p>
+      </section>
+
+      <section id="auth-panel" class="auth-panel panel" hidden aria-labelledby="auth-title">
+        <span class="eyebrow">YOUR PERSONAL WORKSPACE</span>
+        <h1 id="auth-title">Welcome to Monthline.</h1>
+        <p id="auth-description" class="muted">Sign in to keep your monthly earnings together, on every device.</p>
+        <form id="auth-form">
+          <div id="email-field" class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" autocomplete="email" required>
+          </div>
+          <div id="password-field" class="field">
+            <label id="password-label" for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" required>
+          </div>
+          <button id="auth-submit" class="button primary" type="submit">Sign in</button>
+        </form>
+        <div class="auth-options">
+          <button id="toggle-auth" class="text-button">Create an account</button>
+          <button id="reset-password" class="text-button">Forgot password?</button>
+          <button id="back-to-login" class="text-button" hidden>Back to sign in</button>
+        </div>
+        <p id="auth-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="dashboard" hidden aria-labelledby="page-title">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow">LESS GUESSWORK. MORE CLARITY.</span>
+            <h1 id="page-title">Your month, in numbers.</h1>
+            <p class="muted">A little work. A clear picture of what you take home.</p>
+          </div>
+          <span class="location-tag"><span class="dot" aria-hidden="true"></span> Poland · JDG · PLN</span>
+        </div>
+
+        <div class="workspace-grid">
+          <aside class="history-panel panel" aria-labelledby="history-title">
+            <div class="section-heading"><h2 id="history-title">Your months</h2><button id="refresh" class="text-button">Refresh</button></div>
+            <p class="small muted">Saved snapshots, not moving targets.</p>
+            <nav id="history-list" aria-label="Saved months"></nav>
+            <p id="history-empty" class="empty-history">Your first month starts here.<br>Save it to build your history.</p>
+            <div class="history-note"><span aria-hidden="true">↗</span><p>Your settings carry forward.<br>Your saved months stay the same.</p></div>
+          </aside>
+
+          <div class="calculator-column">
+            <div class="month-toolbar">
+              <div class="month-control">
+                <button id="previous-month" class="icon-button" aria-label="Previous month">‹</button>
+                <div><label for="month" class="eyebrow">WORKING MONTH</label><input id="month" type="month" min="1000-01" max="9999-12" required></div>
+                <button id="next-month" class="icon-button" aria-label="Next month">›</button>
+              </div>
+              <span id="save-state" class="save-state">Not saved yet</span>
+            </div>
+
+            <form id="calculator-form" novalidate>
+              <section class="panel work-panel" aria-labelledby="work-title">
+                <div class="section-heading"><h2 id="work-title">Put your work in.</h2><span class="small muted">01 / Earnings</span></div>
+                <div class="work-fields">
+                  <div class="field">
+                    <label for="hours">Working hours <span class="label-hint">this month</span></label>
+                    <div class="input-with-unit"><input id="hours" name="hours" type="text" inputmode="decimal" placeholder="e.g. 160" maxlength="16" aria-describedby="hours-error"><span>hrs</span></div>
+                    <p id="hours-error" class="field-error"></p>
+                  </div>
+                  <span class="multiply" aria-hidden="true">×</span>
+                  <div class="field">
+                    <label for="rate">Hourly rate <span class="label-hint">before VAT</span></label>
+                    <div class="input-with-unit"><input id="rate" name="rate" type="text" inputmode="decimal" placeholder="Your rate" maxlength="16" aria-describedby="rate-error"><span>PLN</span></div>
+                    <p id="rate-error" class="field-error"></p>
+                  </div>
+                </div>
+                <p class="small muted">Fractional hours welcome. Your hourly rate is remembered when you save.</p>
+              </section>
+
+              <div class="summary-grid" aria-label="Calculated earnings" aria-live="polite" aria-atomic="true">
+                <section class="summary-card brutto-card">
+                  <span class="eyebrow">INVOICE BRUTTO</span><strong id="brutto" class="total">—</strong><span class="small">Your base earnings + 23% VAT</span>
+                </section>
+                <section class="summary-card netto-card">
+                  <span class="eyebrow">TAKE-HOME NETTO</span><strong id="netto" class="total">—</strong><span class="small">After tax, fees, and ZUS</span>
+                </section>
+              </div>
+
+              <section class="panel deduction-panel" aria-labelledby="deductions-title">
+                <div class="section-heading"><h2 id="deductions-title">Make it yours.</h2><span class="small muted">02 / Deductions</span></div>
+                <p class="small muted">Adjust for this month. Saved changes become future defaults.</p>
+                <div class="deduction-fields">
+                  <div class="field"><label for="tax">Income tax</label><div class="input-with-unit"><input id="tax" name="tax" type="text" inputmode="decimal" maxlength="16" aria-describedby="tax-error"><span>%</span></div><p id="tax-error" class="field-error"></p></div>
+                  <div class="field"><label for="zus">ZUS</label><div class="input-with-unit"><input id="zus" name="zus" type="text" inputmode="decimal" maxlength="16" aria-describedby="zus-error"><span>PLN</span></div><p id="zus-error" class="field-error"></p></div>
+                  <div class="field"><label for="accounting">Accounting</label><div class="input-with-unit"><input id="accounting" name="accounting" type="text" inputmode="decimal" maxlength="16" aria-describedby="accounting-error"><span>PLN</span></div><p id="accounting-error" class="field-error"></p></div>
+                  <div class="field"><label for="card">Card support</label><div class="input-with-unit"><input id="card" name="card" type="text" inputmode="decimal" maxlength="16" aria-describedby="card-error"><span>PLN</span></div><p id="card-error" class="field-error"></p></div>
+                </div>
+                <details class="breakdown" open>
+                  <summary>The full breakdown</summary>
+                  <dl>
+                    <div><dt>Base earnings, excluding VAT</dt><dd id="breakdown-base">—</dd></div>
+                    <div><dt>VAT <span class="muted">(23%)</span></dt><dd id="breakdown-vat">—</dd></div>
+                    <div class="breakdown-divider"><dt>Income tax <span class="muted">(on base earnings)</span></dt><dd id="breakdown-tax">—</dd></div>
+                    <div><dt>Accounting</dt><dd id="breakdown-accounting">—</dd></div>
+                    <div><dt>Card support</dt><dd id="breakdown-card">—</dd></div>
+                    <div><dt>ZUS</dt><dd id="breakdown-zus">—</dd></div>
+                  </dl>
+                </details>
+              </section>
+
+              <div class="save-row"><p id="save-hint" class="small muted">One month. One saved snapshot.</p><button id="save" type="submit" class="button primary">Save month <span aria-hidden="true">↗</span></button></div>
+            </form>
+            <p id="app-status" class="status" role="status" aria-live="polite"></p>
+            <p class="disclaimer">An estimate using your custom JDG formula, not tax advice. VAT is part of your invoice, not take-home pay. All amounts are rounded to grosz.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer"><span>monthline</span><span>A clearer end to every month.</span></footer>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>
