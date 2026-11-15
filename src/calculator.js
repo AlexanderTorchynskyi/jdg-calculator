@@ -62,7 +62,8 @@ export function calculate(inputs) {
   const accounting = BigInt(inputs.accounting);
   const card = BigInt(inputs.card);
   const zus = BigInt(inputs.zus);
-  return { base, vat, tax, accounting, card, zus, brutto: base + vat, netto: base - tax - accounting - card - zus };
+  const nettoBeforeTax = base - accounting - card - zus;
+  return { base, vat, tax, accounting, card, zus, brutto: base + vat, nettoBeforeTax, netto: nettoBeforeTax - tax };
 }
 
 const grouping = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 });

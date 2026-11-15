@@ -67,7 +67,11 @@ function renderCalculation() {
     $(field).setAttribute('aria-invalid', String(Boolean(message)));
   }
   const totals = result.valid ? calculate(result.inputs) : null;
-  for (const key of ['brutto', 'netto']) $(key).textContent = totals ? money(totals[key]) : '—';
+  for (const key of ['brutto', 'nettoBeforeTax', 'netto']) {
+    const id = key === 'nettoBeforeTax' ? 'netto-before-tax' : key;
+    $(id).textContent = totals ? money(totals[key]) : '—';
+  }
+  $('brutto-ex-vat').textContent = totals ? money(totals.base) : '—';
   for (const key of ['base', 'vat', 'tax', 'accounting', 'card', 'zus']) {
     $(`breakdown-${key}`).textContent = totals ? `${['tax', 'accounting', 'card', 'zus'].includes(key) ? '− ' : ''}${money(totals[key])}` : '—';
   }
