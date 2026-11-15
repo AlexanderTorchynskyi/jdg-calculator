@@ -36,8 +36,9 @@ export function selectMonth(workspace, month) {
   const defaults = workspace.defaults.filter((entry) => entry.month <= month)
     .sort((a, b) => b.month.localeCompare(a.month))[0];
   const source = saved ?? defaults;
-  const values = { hours: saved ? decimal(saved.hours) : '', ...DEFAULTS };
-  if (source) for (const key of SETTINGS) values[key] = decimal(source[key]);
+  const display = (value, whole) => whole && value % 100 === 0 ? String(value / 100) : decimal(value);
+  const values = { hours: saved ? display(saved.hours, true) : '', ...DEFAULTS };
+  if (source) for (const key of SETTINGS) values[key] = display(source[key], key === 'rate');
   return { values, saved: Boolean(saved) };
 }
 

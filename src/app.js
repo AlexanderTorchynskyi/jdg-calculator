@@ -69,7 +69,8 @@ function renderCalculation() {
     $(`${field}-error`).textContent = message;
     $(field).setAttribute('aria-invalid', String(Boolean(message)));
   }
-  const totals = result.valid ? calculate(result.inputs) : null;
+  const saved = isSaved && !dirty() ? workspace.records.find((record) => record.month === month) : null;
+  const totals = result.valid ? calculate(result.inputs) : saved ? calculate(saved) : null;
   for (const key of ['brutto', 'netto']) $(key).textContent = totals ? money(totals[key]) : '—';
   for (const key of ['base', 'vat', 'tax', 'accounting', 'card', 'zus']) {
     $(`breakdown-${key}`).textContent = totals ? `${['tax', 'accounting', 'card', 'zus'].includes(key) ? '− ' : ''}${money(totals[key])}` : '—';

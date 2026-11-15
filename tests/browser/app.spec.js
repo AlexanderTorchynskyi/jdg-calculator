@@ -91,6 +91,16 @@ test('unsaved preview is responsive, accessible and calculates the exact formula
   await page.getByLabel('Hourly rate').fill('100');
   await expect(page.locator('#brutto')).toContainText('19,680.00 PLN');
   await expect(page.locator('#netto')).toContainText('11,433.00 PLN');
+  for (const field of ['hours', 'rate']) {
+    for (const value of ['1.5', '1,5', '1.00']) {
+      await page.locator(`#${field}`).fill(value);
+      await expect(page.locator(`#${field}-error`)).toContainText('whole number');
+      await expect(page.locator('#netto')).toHaveText('—');
+    }
+    await page.locator(`#${field}`).fill(field === 'hours' ? '160' : '100');
+  }
+  await page.locator('#tax').fill('10,25');
+  await expect(page.locator('#netto')).toContainText('11,433.00 PLN');
   await page.getByLabel('ZUS', { exact: true }).fill('3000');
   await expect(page.locator('#netto')).toContainText('11,052.00 PLN');
   await page.getByLabel('Working hours').fill('0');
@@ -148,9 +158,9 @@ test('monthly snapshots survive reload and sync to another device; defaults pres
   await page.reload();
   await expect(page.locator('#app-status')).toHaveText('Up to date.');
   await page.getByRole('button', { name: /January 2026/ }).click();
-  await expect(page.locator('#hours')).toHaveValue('160.00');
+  await expect(page.locator('#hours')).toHaveValue('160');
   await month(page, '2026-02');
-  await expect(page.locator('#rate')).toHaveValue('100.00');
+  await expect(page.locator('#rate')).toHaveValue('100');
   await page.getByLabel('Working hours').fill('120');
   await page.getByLabel('ZUS', { exact: true }).fill('3000');
   await page.getByRole('button', { name: 'Save month' }).click();
@@ -178,6 +188,30 @@ test('monthly snapshots survive reload and sync to another device; defaults pres
   await expect(page.locator('#month')).toHaveValue('2026-01');
   await noOverflow(page);
   await noOverflow(second);
+});
+
+test('legacy fractional snapshots remain visible but require whole numbers before saving', async ({ page, context }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith('sync'));
+  const { state } = await mockBackend(context);
+  const record = { month: '2026-01', hours: 16050, rate: 10025, tax: 1025, accounting: 29900, card: 900, zus: 261900 };
+  state.records.push(record);
+  state.defaults.push({ ...record });
+  state.revision = 1;
+  await login(page);
+  await month(page, '2026-01');
+  await expect(page.locator('#hours')).toHaveValue('160.50');
+  await expect(page.locator('#rate')).toHaveValue('100.25');
+  await expect(page.locator('#netto')).not.toHaveText('—');
+  await page.getByRole('button', { name: 'Save month' }).click();
+  await expect(page.locator('#hours-error')).toContainText('whole number');
+  await expect(page.locator('#rate-error')).toContainText('whole number');
+  expect(state.records[0]).toEqual(record);
+  await page.locator('#hours').fill('160');
+  await page.locator('#rate').fill('100');
+  await page.getByRole('button', { name: 'Save month' }).click();
+  await expect(page.locator('#app-status')).toContainText('January 2026 saved');
+  expect(state.records[0].hours).toBe(16000);
+  expect(state.records[0].rate).toBe(10000);
 });
 
 test('failed and conflicting saves keep edits; explicit refresh and discard are required', async ({ page, context }, testInfo) => {

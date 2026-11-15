@@ -1,6 +1,6 @@
 export const FIELDS = {
-  hours: { label: 'Working hours', max: 1_000_000 },
-  rate: { label: 'Hourly rate', max: 1_000_000_000 },
+  hours: { label: 'Working hours', max: 1_000_000, whole: true },
+  rate: { label: 'Hourly rate', max: 1_000_000_000, whole: true },
   tax: { label: 'Income tax', max: 10_000 },
   accounting: { label: 'Accounting', max: 1_000_000_000 },
   card: { label: 'Card support', max: 1_000_000_000 },
@@ -14,6 +14,9 @@ export function parseHundredths(value, field) {
   const text = String(value).trim().replace(',', '.');
   const spec = FIELDS[field];
   if (!spec) throw new Error(`Unknown field: ${field}`);
+  if (spec.whole && !/^\d+$/.test(text)) {
+    throw new Error(`${spec.label}: enter a non-negative whole number.`);
+  }
   if (!/^\d+(?:\.\d{1,2})?$/.test(text)) {
     throw new Error(`${spec.label}: enter a non-negative number with up to two decimal places.`);
   }

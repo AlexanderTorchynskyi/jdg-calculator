@@ -52,7 +52,9 @@ netto  = base − tax − accounting − card support − ZUS
 
 Defaults: income tax **10.25%**, accounting **299 PLN**, card support **9 PLN**, ZUS **2619 PLN**. There is no predefined hourly rate; enter it once and save to carry it forward. Everything except VAT is editable. VAT does not enter the take-home tax base. Saved or inherited tax settings take precedence over the built-in default.
 
-Inputs accept a dot or comma decimal separator, with up to two decimal places. Hours can be fractional or zero; negative netto is retained. Base earnings, VAT, and tax are rounded half-up to grosz using integer arithmetic; totals are derived from those rounded components so the breakdown reconciles.
+Working hours and hourly rate must be non-negative whole numbers. Tax and deductions accept a dot or comma decimal separator, with up to two decimal places. Negative netto is retained. Base earnings, VAT, and tax are rounded half-up to grosz using integer arithmetic; totals are derived from those rounded components so the breakdown reconciles.
+
+Existing saved fractional hours or rates remain intact and their original earnings can still be viewed. Replace fractional hours or rates with whole numbers before saving an edited snapshot or using an inherited fractional rate for a new month.
 
 For example, 160 hours at 100 PLN/hour produces base earnings of 16,000 PLN, brutto of **19,680 PLN**, and netto of **11,433 PLN** with the default deductions.
 

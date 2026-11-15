@@ -13,8 +13,8 @@ test('exact custom formula: 160 hours at PLN 100', () => {
   });
 });
 
-test('fractional hours, comma decimals and half-up rounding reconcile', () => {
-  const inputs = sample({ hours: '1,25', rate: '0.02', tax: '50', accounting: '0', card: '0', zus: '0' });
+test('legacy fractional hours and rates still calculate with half-up rounding', () => {
+  const inputs = { ...sample({ tax: '50', accounting: '0', card: '0', zus: '0' }), hours: 125, rate: 2 };
   const result = calculate(inputs);
   assert.equal(result.base, 3n);
   assert.equal(result.vat, 1n);
@@ -42,11 +42,23 @@ test('all numeric fields reject missing, malformed, negative, excess precision a
     for (const value of ['', ' ', '-1', 'Infinity', 'NaN', '1e3', '1.234', '1.2.3', '+2', '.5', '1,2.3', 'x']) {
       assert.throws(() => parseHundredths(value, key), undefined, `${key}: ${value}`);
     }
-    assert.equal(parseHundredths(decimal(spec.max), key), spec.max);
-    assert.throws(() => parseHundredths(decimal(spec.max + 1), key));
+    assert.equal(parseHundredths(spec.whole ? String(spec.max / 100) : decimal(spec.max), key), spec.max);
+    assert.throws(() => parseHundredths(spec.whole ? String(spec.max / 100 + 1) : decimal(spec.max + 1), key), /maximum/);
   }
   assert.equal(validateInputs({}).valid, false);
   assert.throws(() => calculate({ ...sample(), hours: 1.5 }));
+});
+
+test('hours and rate require whole numbers while deductions retain decimals', () => {
+  for (const field of ['hours', 'rate']) {
+    for (const value of ['1.5', '1,5', '1.00', '1,00']) {
+      assert.throws(() => parseHundredths(value, field), /whole number/);
+    }
+    assert.equal(parseHundredths('0', field), 0);
+    assert.equal(parseHundredths('123', field), 12300);
+  }
+  assert.equal(parseHundredths('10,25', 'tax'), 1025);
+  assert.equal(parseHundredths('1.50', 'zus'), 150);
 });
 
 test('large permitted values remain exact', () => {
@@ -62,11 +74,11 @@ test('effective defaults affect unsaved months and never replace saved snapshots
   const savedFuture = { ...first, month: '2026-06', hours: 12_000 };
   const workspace = { revision: 2, records: [first, savedFuture], defaults: [first, changed] };
   assert.equal(selectMonth(workspace, '2025-12').values.rate, '');
-  assert.equal(selectMonth(workspace, '2026-03').values.rate, '100.00');
-  assert.equal(selectMonth(workspace, '2026-05').values.rate, '200.00');
+  assert.equal(selectMonth(workspace, '2026-03').values.rate, '100');
+  assert.equal(selectMonth(workspace, '2026-05').values.rate, '200');
   assert.equal(selectMonth(workspace, '2026-05').values.zus, '3000.00');
-  assert.equal(selectMonth(workspace, '2026-06').values.rate, '100.00');
-  assert.equal(selectMonth(workspace, '2026-06').values.hours, '120.00');
+  assert.equal(selectMonth(workspace, '2026-06').values.rate, '100');
+  assert.equal(selectMonth(workspace, '2026-06').values.hours, '120');
   assert.equal(selectMonth(workspace, '2026-05').saved, false);
 });
 
@@ -78,9 +90,17 @@ test('fresh months require a rate while saved rates remain unchanged', () => {
     assert.equal(selected.saved, false);
   }
   const saved = { month: '2026-11', ...sample({ rate: '80' }) };
-  assert.equal(selectMonth({ revision: 1, records: [saved], defaults: [] }, saved.month).values.rate, '80.00');
+  assert.equal(selectMonth({ revision: 1, records: [saved], defaults: [] }, saved.month).values.rate, '80');
 });
 
+test('legacy fractional snapshots and defaults remain intact and visible', () => {
+  const record = { month: '2026-01', ...sample(), hours: 16050, rate: 10025 };
+  const workspace = decodeWorkspace({ revision: 1, records: [record], defaults: [record] });
+  assert.equal(selectMonth(workspace, '2026-01').values.hours, '160.50');
+  assert.equal(selectMonth(workspace, '2026-01').values.rate, '100.25');
+  assert.equal(selectMonth(workspace, '2026-02').values.rate, '100.25');
+  assert.equal(summarizeEarnings(workspace.records).total, calculate(record).netto);
+});
 test('working hours alone cannot produce earnings without an hourly rate', () => {
   const result = validateInputs({ ...DEFAULTS, hours: '160' });
   assert.equal(result.valid, false);

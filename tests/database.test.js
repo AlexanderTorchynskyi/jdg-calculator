@@ -46,12 +46,12 @@ test('PostgreSQL schema: persistence, effective settings, RLS, atomic validation
   assert.equal(state.defaults.length, 1);
   state = await save('2026-02', 3, { rate: 20000, zus: 300000 });
   assert.equal(state.defaults.length, 2);
-  assert.equal(selectMonth(state, '2026-03').values.rate, '100.00', 'saved future snapshot is unchanged');
-  assert.equal(selectMonth(state, '2026-04').values.rate, '200.00');
+  assert.equal(selectMonth(state, '2026-03').values.rate, '100', 'saved future snapshot is unchanged');
+  assert.equal(selectMonth(state, '2026-04').values.rate, '200');
   state = await save('2026-05', 4, { rate: 25000, zus: 300000 });
   state = await save('2026-02', 5, { rate: 22000, zus: 310000 });
-  assert.equal(selectMonth(state, '2026-04').values.rate, '220.00');
-  assert.equal(selectMonth(state, '2026-06').values.rate, '250.00', 'later effective changes are preserved');
+  assert.equal(selectMonth(state, '2026-04').values.rate, '220');
+  assert.equal(selectMonth(state, '2026-06').values.rate, '250', 'later effective changes are preserved');
 
   await assert.rejects(save('2026-06', 5), /another device/);
   assert.deepEqual(await load(), state, 'stale save has no side effects');
