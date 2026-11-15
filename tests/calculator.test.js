@@ -9,7 +9,7 @@ test('exact custom formula: 160 hours at PLN 100', () => {
   assert.deepEqual(calculate(sample()), {
     base: 1_600_000n, vat: 368_000n, tax: 164_000n,
     accounting: 29_900n, card: 900n, zus: 261_900n,
-    brutto: 1_968_000n, nettoBeforeTax: 1_307_300n, netto: 1_143_300n,
+    brutto: 1_968_000n, netto: 1_143_300n,
   });
 });
 
@@ -20,14 +20,12 @@ test('fractional hours, comma decimals and half-up rounding reconcile', () => {
   assert.equal(result.vat, 1n);
   assert.equal(result.tax, 2n);
   assert.equal(result.brutto, 4n);
-  assert.equal(result.nettoBeforeTax, 3n);
   assert.equal(result.netto, 1n);
 });
 
 test('zero hours retains all fixed deductions and negative netto', () => {
   const result = calculate(sample({ hours: '0' }));
   assert.equal(result.brutto, 0n);
-  assert.equal(result.nettoBeforeTax, -292_700n);
   assert.equal(result.netto, -292_700n);
   assert.equal(money(-1n), '-0.01 PLN');
 });
@@ -36,7 +34,6 @@ test('editable deductions and tax are applied to base, not invoice', () => {
   const result = calculate(sample({ hours: '10', rate: '100', tax: '20', accounting: '100', card: '5', zus: '500' }));
   assert.equal(result.brutto, 123_000n);
   assert.equal(result.tax, 20_000n);
-  assert.equal(result.nettoBeforeTax, 39_500n);
   assert.equal(result.netto, 19_500n);
 });
 
