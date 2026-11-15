@@ -55,7 +55,31 @@
           <span class="location-tag"><span class="dot" aria-hidden="true"></span> Poland · JDG · PLN</span>
         </div>
 
-        <div class="workspace-grid">
+        <div class="view-tabs" role="tablist" aria-label="Views">
+          <button id="tab-calculator" class="view-tab" role="tab" aria-selected="true" aria-controls="calculator-view">Calculator</button>
+          <button id="tab-earnings" class="view-tab" role="tab" aria-selected="false" aria-controls="earnings-view" tabindex="-1">All months</button>
+        </div>
+
+        <section id="earnings-view" class="earnings-view" role="tabpanel" aria-labelledby="tab-earnings" hidden>
+          <div class="summary-grid earnings-summary" aria-live="polite" aria-atomic="true">
+            <section class="summary-card netto-card">
+              <span class="eyebrow">TOTAL TAKE-HOME NETTO</span><strong id="earnings-total" class="total">—</strong><span class="small">Across all saved months</span>
+            </section>
+            <section class="summary-card brutto-card">
+              <span class="eyebrow">AVERAGE PER MONTH</span><strong id="earnings-average" class="total">—</strong><span id="earnings-count" class="small">No months saved</span>
+            </section>
+          </div>
+          <section class="panel" aria-labelledby="earnings-title">
+            <div class="section-heading"><h2 id="earnings-title">Month by month</h2><button id="earnings-refresh" class="text-button">Refresh</button></div>
+            <p id="earnings-empty" class="empty-history">Nothing saved yet.<br>Save a month to see what you have earned.</p>
+            <table id="earnings-table" class="earnings-table" hidden>
+              <thead><tr><th scope="col">Month</th><th scope="col" class="amount">Netto</th></tr></thead>
+              <tbody id="earnings-body"></tbody>
+            </table>
+          </section>
+        </section>
+
+        <div id="calculator-view" class="workspace-grid" role="tabpanel" aria-labelledby="tab-calculator">
           <aside class="history-panel panel" aria-labelledby="history-title">
             <div class="section-heading"><h2 id="history-title">Your months</h2><button id="refresh" class="text-button">Refresh</button></div>
             <p class="small muted">Saved snapshots, not moving targets.</p>

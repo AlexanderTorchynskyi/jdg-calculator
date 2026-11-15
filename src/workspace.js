@@ -1,4 +1,4 @@
-import { assertInputs, decimal, DEFAULTS, SETTINGS } from './calculator.js';
+import { assertInputs, calculate, decimal, DEFAULTS, SETTINGS } from './calculator.js';
 
 export function validMonth(value) {
   return typeof value === 'string' && /^(?:[1-9]\d{3})-(?:0[1-9]|1[0-2])$/.test(value);
@@ -43,4 +43,19 @@ export function selectMonth(workspace, month) {
 
 export function emptyWorkspace() {
   return { revision: 0, records: [], defaults: [] };
+}
+
+export function summarizeEarnings(records) {
+  const months = [...records]
+    .sort((a, b) => b.month.localeCompare(a.month))
+    .map((record) => ({ month: record.month, netto: calculate(record).netto }));
+  const total = months.reduce((sum, entry) => sum + entry.netto, 0n);
+  const count = BigInt(months.length);
+  let average = 0n;
+  if (count > 0n) {
+    const magnitude = total < 0n ? -total : total;
+    const rounded = (magnitude * 2n + count) / (count * 2n);
+    average = total < 0n ? -rounded : rounded;
+  }
+  return { months, total, count: months.length, average };
 }

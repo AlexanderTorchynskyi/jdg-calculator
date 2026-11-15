@@ -1,6 +1,6 @@
 import './styles.css';
 import { FIELDS, validateInputs, calculate, money } from './calculator.js';
-import { currentMonth, emptyWorkspace, monthLabel, selectMonth, validMonth } from './workspace.js';
+import { currentMonth, emptyWorkspace, monthLabel, selectMonth, summarizeEarnings, validMonth } from './workspace.js';
 import { createBackend } from './backend.js';
 
 const $ = (id) => document.getElementById(id);
@@ -17,6 +17,7 @@ let generation = 0;
 let touched = new Set();
 let isSaved = false;
 let ready = false;
+let view = 'calculator';
 
 function status(id, message, error = false) {
   $(id).textContent = message;
@@ -46,6 +47,8 @@ function updateControls() {
   $('save').disabled = busy || !connected;
   $('save').textContent = busy ? 'Please wait…' : 'Save month ↗';
   $('refresh').disabled = busy || !backend || !user;
+  $('earnings-refresh').disabled = $('refresh').disabled;
+  for (const button of $('earnings-body').querySelectorAll('button')) button.disabled = busy;
   for (const id of ['month', 'previous-month', 'next-month', ...fieldNames]) $(id).disabled = busy;
   $('sign-out').disabled = busy || authBusy;
   for (const button of $('history-list').querySelectorAll('button')) button.disabled = busy;
@@ -92,6 +95,45 @@ function renderHistory() {
   }
 }
 
+function renderEarnings() {
+  const summary = summarizeEarnings(workspace.records);
+  $('earnings-total').textContent = summary.count ? money(summary.total) : '—';
+  $('earnings-average').textContent = summary.count ? money(summary.average) : '—';
+  $('earnings-count').textContent = summary.count
+    ? `Over ${summary.count} saved ${summary.count === 1 ? 'month' : 'months'}`
+    : 'No months saved';
+  $('earnings-empty').hidden = summary.count > 0;
+  $('earnings-table').hidden = summary.count === 0;
+  $('earnings-body').replaceChildren(...summary.months.map((entry) => {
+    const row = document.createElement('tr');
+    const monthCell = document.createElement('td');
+    const open = document.createElement('button');
+    open.className = 'earnings-row';
+    open.textContent = monthLabel(entry.month);
+    open.setAttribute('aria-label', `Open ${monthLabel(entry.month)}`);
+    open.addEventListener('click', async () => {
+      await changeMonth(entry.month);
+      if (month === entry.month) setView('calculator');
+    });
+    monthCell.append(open);
+    const amount = document.createElement('td');
+    amount.className = entry.netto < 0n ? 'amount negative' : 'amount';
+    amount.textContent = money(entry.netto);
+    row.append(monthCell, amount);
+    return row;
+  }));
+}
+
+function setView(next) {
+  view = next;
+  for (const [name, tab] of [['calculator', $('tab-calculator')], ['earnings', $('tab-earnings')]]) {
+    tab.setAttribute('aria-selected', String(name === view));
+    tab.tabIndex = name === view ? 0 : -1;
+  }
+  $('calculator-view').hidden = view !== 'calculator';
+  $('earnings-view').hidden = view !== 'earnings';
+}
+
 function applyMonth(nextMonth) {
   const selected = selectMonth(workspace, nextMonth);
   month = nextMonth;
@@ -101,6 +143,7 @@ function applyMonth(nextMonth) {
   touched = new Set();
   for (const field of fieldNames) $(field).value = selected.values[field];
   renderHistory();
+  renderEarnings();
   renderCalculation();
 }
 
@@ -189,6 +232,7 @@ async function handleSession(event, session) {
     user = session?.user ?? null;
     workspace = emptyWorkspace();
     applyMonth(currentMonth());
+    setView('calculator');
     $('account-email').textContent = user?.email ?? '';
     $('sign-out').hidden = !user;
     setAuthMode('recovery');
@@ -202,6 +246,7 @@ async function handleSession(event, session) {
   workspace = emptyWorkspace();
   user = nextUser;
   applyMonth(currentMonth());
+  setView('calculator');
   $('account-email').textContent = user?.email ?? '';
   $('sign-out').hidden = !user;
   setAuthMode('login');
@@ -257,6 +302,15 @@ $('month').addEventListener('change', () => changeMonth($('month').value));
 $('previous-month').addEventListener('click', () => shiftMonth(-1));
 $('next-month').addEventListener('click', () => shiftMonth(1));
 $('refresh').addEventListener('click', () => sync(month));
+$('earnings-refresh').addEventListener('click', () => sync(month));
+$('tab-calculator').addEventListener('click', () => setView('calculator'));
+$('tab-earnings').addEventListener('click', () => setView('earnings'));
+$('tab-calculator').parentElement.addEventListener('keydown', (event) => {
+  if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  const next = view === 'calculator' ? 'earnings' : 'calculator';
+  setView(next);
+  $(`tab-${next}`).focus();
+});
 window.addEventListener('beforeunload', (event) => {
   if (dirty() || busy) {
     event.preventDefault();

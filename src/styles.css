@@ -35,6 +35,20 @@ h2 { font-size: 1.06rem; font-weight: 600; margin-bottom: 0; letter-spacing: -.2
 .location-tag { font-size: .75rem; display: flex; gap: 8px; align-items: center; white-space: nowrap; background: #edf1eb; padding: 10px 14px; border-radius: 24px; }
 .dot { width: 6px; height: 6px; border-radius: 50%; background: #44805d; }
 .workspace-grid { display: grid; grid-template-columns: 245px minmax(0, 1fr); gap: 28px; align-items: start; }
+.view-tabs { display: flex; gap: 6px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+.view-tab { background: transparent; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 12px 16px; color: var(--muted); font-size: .8rem; font-weight: 550; }
+.view-tab[aria-selected="true"] { color: var(--green); border-bottom-color: var(--green); }
+.earnings-view { display: grid; gap: 4px; }
+.summary-grid.earnings-summary { margin-top: 0; }
+.earnings-table { width: 100%; border-collapse: collapse; font-size: .85rem; font-variant-numeric: tabular-nums; }
+.earnings-table th { text-align: left; font-size: .65rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); font-weight: 650; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.earnings-table td { padding: 0; border-bottom: 1px solid var(--border); }
+.earnings-table .amount { text-align: right; }
+.earnings-table td.amount { padding: 14px 10px; font-weight: 600; }
+.earnings-row { display: flex; width: 100%; padding: 14px 10px; background: transparent; border: 0; color: var(--green); text-align: left; font-weight: 550; }
+.earnings-row:hover { background: #f4f7f1; }
+.earnings-table .negative { color: #a22f2f; }
+@media (max-width: 720px) { .summary-grid.earnings-summary { grid-template-columns: 1fr; } }
 .panel { border: 1px solid var(--border); border-radius: 16px; background: #fff; padding: 25px; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .section-heading .small { font-size: .68rem; white-space: nowrap; }

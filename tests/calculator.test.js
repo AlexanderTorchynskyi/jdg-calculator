@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calculate, DEFAULTS, decimal, FIELDS, money, parseHundredths, validateInputs } from '../src/calculator.js';
-import { currentMonth, decodeWorkspace, emptyWorkspace, selectMonth, validMonth } from '../src/workspace.js';
+import { currentMonth, decodeWorkspace, emptyWorkspace, selectMonth, summarizeEarnings, validMonth } from '../src/workspace.js';
 
 const sample = (values = {}) => validateInputs({ hours: '160', ...DEFAULTS, rate: '100', ...values }).inputs;
 
@@ -111,4 +111,25 @@ test('calendar validation and local current month', () => {
     assert.equal(validMonth(month), false);
   }
   assert.throws(() => selectMonth(emptyWorkspace(), '2026-13'));
+});
+
+test('earnings summary totals netto across months, newest first', () => {
+  const record = (month, values) => ({ month, ...sample(values) });
+  assert.deepEqual(summarizeEarnings([]), { months: [], total: 0n, count: 0, average: 0n });
+  const summary = summarizeEarnings([
+    record('2026-01', { hours: '160' }),
+    record('2026-03', { hours: '0' }),
+    record('2026-02', { hours: '120' }),
+  ]);
+  assert.deepEqual(summary.months.map((entry) => entry.month), ['2026-03', '2026-02', '2026-01']);
+  assert.deepEqual(summary.months.map((entry) => entry.netto), [-292_700n, 784_300n, 1_143_300n]);
+  assert.equal(summary.total, 1_634_900n);
+  assert.equal(summary.count, 3);
+  assert.equal(summary.average, 544_967n);
+});
+
+test('earnings average rounds half away from zero', () => {
+  const record = (month, zus) => ({ month, ...sample({ hours: '0', accounting: '0', card: '0', zus }) });
+  assert.equal(summarizeEarnings([record('2026-01', '0.01'), record('2026-02', '0')]).average, -1n);
+  assert.equal(summarizeEarnings([record('2026-01', '0.02'), record('2026-02', '0')]).average, -1n);
 });
