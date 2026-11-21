@@ -103,6 +103,30 @@ function renderEarnings() {
   $('earnings-count').textContent = summary.count
     ? `Over ${summary.count} saved ${summary.count === 1 ? 'month' : 'months'}`
     : 'No months saved';
+  $('invoice-average').textContent = summary.invoiceCount ? money(summary.averageInvoice) : '—';
+  $('invoice-count').textContent = summary.invoiceCount
+    ? `Across ${summary.invoiceCount} ${summary.invoiceCount === 1 ? 'invoice' : 'invoices'}`
+    : 'No invoices yet';
+  $('years-empty').hidden = summary.count > 0;
+  $('years-table').hidden = summary.count === 0;
+  $('years-body').replaceChildren(...summary.years.map((entry) => {
+    const row = document.createElement('tr');
+    const year = document.createElement('th');
+    year.scope = 'row';
+    year.textContent = entry.year;
+    const months = document.createElement('span');
+    months.className = 'small muted';
+    months.textContent = ` · ${entry.count} ${entry.count === 1 ? 'month' : 'months'}`;
+    year.append(months);
+    const invoice = document.createElement('td');
+    invoice.className = 'amount';
+    invoice.textContent = entry.invoiceCount ? money(entry.averageInvoice) : '—';
+    const netto = document.createElement('td');
+    netto.className = entry.average < 0n ? 'amount negative' : 'amount';
+    netto.textContent = money(entry.average);
+    row.append(year, invoice, netto);
+    return row;
+  }));
   $('earnings-empty').hidden = summary.count > 0;
   $('earnings-table').hidden = summary.count === 0;
   $('earnings-body').replaceChildren(...summary.months.map((entry) => {

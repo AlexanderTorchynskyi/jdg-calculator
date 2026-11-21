@@ -182,6 +182,13 @@ test('monthly snapshots survive reload and sync to another device; defaults pres
   await expect(page.locator('#earnings-body tr').nth(1)).toContainText('11,433.00 PLN');
   await expect(page.locator('#earnings-total')).toHaveText('18,895.00 PLN');
   await expect(page.locator('#earnings-average')).toHaveText('9,447.50 PLN');
+  await expect(page.locator('#invoice-average')).toHaveText('17,220.00 PLN');
+  await expect(page.locator('#invoice-count')).toHaveText('Across 2 invoices');
+  await expect(page.locator('#years-body tr')).toHaveCount(1);
+  await expect(page.locator('#years-body tr').first()).toContainText('2026');
+  await expect(page.locator('#years-body tr').first()).toContainText('2 months');
+  await expect(page.locator('#years-body tr').first()).toContainText('17,220.00 PLN');
+  await expect(page.locator('#years-body tr').first()).toContainText('9,447.50 PLN');
   await noOverflow(page);
   await page.getByRole('button', { name: 'Open January 2026' }).click();
   await expect(page.locator('#calculator-view')).toBeVisible();

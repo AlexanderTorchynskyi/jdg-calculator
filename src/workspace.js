@@ -46,17 +46,43 @@ export function emptyWorkspace() {
   return { revision: 0, records: [], defaults: [] };
 }
 
+function averageHalfUp(total, count) {
+  if (count === 0) return 0n;
+  const divisor = BigInt(count);
+  const magnitude = total < 0n ? -total : total;
+  const rounded = (magnitude * 2n + divisor) / (divisor * 2n);
+  return total < 0n ? -rounded : rounded;
+}
+
+// Months with no invoice (zero brutto) are left out of invoice averages.
+function invoiceStats(entries) {
+  const invoiced = entries.filter((entry) => entry.brutto > 0n);
+  const total = invoiced.reduce((sum, entry) => sum + entry.brutto, 0n);
+  return { invoiceCount: invoiced.length, averageInvoice: averageHalfUp(total, invoiced.length) };
+}
+
 export function summarizeEarnings(records) {
   const months = [...records]
     .sort((a, b) => b.month.localeCompare(a.month))
-    .map((record) => ({ month: record.month, netto: calculate(record).netto }));
+    .map((record) => {
+      const result = calculate(record);
+      return { month: record.month, netto: result.netto, brutto: result.brutto };
+    });
   const total = months.reduce((sum, entry) => sum + entry.netto, 0n);
-  const count = BigInt(months.length);
-  let average = 0n;
-  if (count > 0n) {
-    const magnitude = total < 0n ? -total : total;
-    const rounded = (magnitude * 2n + count) / (count * 2n);
-    average = total < 0n ? -rounded : rounded;
+  const byYear = new Map();
+  for (const entry of months) {
+    const year = entry.month.slice(0, 4);
+    byYear.set(year, [...(byYear.get(year) ?? []), entry]);
   }
-  return { months, total, count: months.length, average };
+  const years = [...byYear].map(([year, entries]) => ({
+    year,
+    count: entries.length,
+    average: averageHalfUp(entries.reduce((sum, entry) => sum + entry.netto, 0n), entries.length),
+    ...invoiceStats(entries),
+  }));
+  return {
+    months, years, total, count: months.length,
+    average: averageHalfUp(total, months.length),
+    ...invoiceStats(months),
+  };
 }

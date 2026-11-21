@@ -135,7 +135,7 @@ test('calendar validation and local current month', () => {
 
 test('earnings summary totals netto across months, newest first', () => {
   const record = (month, values) => ({ month, ...sample(values) });
-  assert.deepEqual(summarizeEarnings([]), { months: [], total: 0n, count: 0, average: 0n });
+  assert.deepEqual(summarizeEarnings([]), { months: [], years: [], total: 0n, count: 0, average: 0n, invoiceCount: 0, averageInvoice: 0n });
   const summary = summarizeEarnings([
     record('2026-01', { hours: '160' }),
     record('2026-03', { hours: '0' }),
@@ -152,4 +152,26 @@ test('earnings average rounds half away from zero', () => {
   const record = (month, zus) => ({ month, ...sample({ hours: '0', accounting: '0', card: '0', zus }) });
   assert.equal(summarizeEarnings([record('2026-01', '0.01'), record('2026-02', '0')]).average, -1n);
   assert.equal(summarizeEarnings([record('2026-01', '0.02'), record('2026-02', '0')]).average, -1n);
+});
+
+test('earnings summary averages invoices overall and per year, skipping months without an invoice', () => {
+  const record = (month, values) => ({ month, ...sample(values) });
+  const empty = summarizeEarnings([]);
+  assert.deepEqual([empty.years, empty.invoiceCount, empty.averageInvoice], [[], 0, 0n]);
+  const summary = summarizeEarnings([
+    record('2025-12', { hours: '100' }),
+    record('2026-01', { hours: '160' }),
+    record('2026-02', { hours: '0' }),
+    record('2026-03', { hours: '120' }),
+  ]);
+  assert.deepEqual(summary.months.map((entry) => entry.brutto), [1_476_000n, 0n, 1_968_000n, 1_230_000n]);
+  assert.equal(summary.invoiceCount, 3);
+  assert.equal(summary.averageInvoice, 1_558_000n);
+  assert.deepEqual(summary.years.map((entry) => entry.year), ['2026', '2025']);
+  const [y2026, y2025] = summary.years;
+  assert.deepEqual([y2026.count, y2026.invoiceCount, y2026.averageInvoice], [3, 2, 1_722_000n]);
+  assert.equal(y2026.average, 544_967n);
+  assert.deepEqual([y2025.count, y2025.invoiceCount, y2025.averageInvoice], [1, 1, 1_230_000n]);
+  const onlyZero = summarizeEarnings([record('2026-01', { hours: '0' })]);
+  assert.deepEqual([onlyZero.invoiceCount, onlyZero.averageInvoice, onlyZero.years[0].invoiceCount], [0, 0n, 0]);
 });

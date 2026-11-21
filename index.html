@@ -69,6 +69,16 @@
               <span class="eyebrow">AVERAGE PER MONTH</span><strong id="earnings-average" class="total">—</strong><span id="earnings-count" class="small">No months saved</span>
             </section>
           </div>
+          <section class="panel" aria-labelledby="invoice-title">
+            <div class="section-heading"><h2 id="invoice-title">Average invoice</h2><span class="small muted">Brutto, months with an invoice</span></div>
+            <p id="invoice-overall" class="invoice-overall"><span class="eyebrow">ALL SUBMITTED INVOICES</span><strong id="invoice-average" class="total">—</strong><span id="invoice-count" class="small">No invoices yet</span></p>
+            <p id="years-empty" class="empty-history">Nothing saved yet.<br>Save a month to see yearly averages.</p>
+            <table id="years-table" class="earnings-table" hidden>
+              <caption class="visually-hidden">Averages by year</caption>
+              <thead><tr><th scope="col">Year</th><th scope="col" class="amount">Avg invoice</th><th scope="col" class="amount">Avg netto</th></tr></thead>
+              <tbody id="years-body"></tbody>
+            </table>
+          </section>
           <section class="panel" aria-labelledby="earnings-title">
             <div class="section-heading"><h2 id="earnings-title">Month by month</h2><button id="earnings-refresh" class="text-button">Refresh</button></div>
             <p id="earnings-empty" class="empty-history">Nothing saved yet.<br>Save a month to see what you have earned.</p>

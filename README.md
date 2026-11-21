@@ -70,7 +70,7 @@ Supported input limits: 10,000 working hours per month, 10,000,000 PLN for each 
 - Month changes, refresh, and sign-out prompt before discarding edits. Reload/close warnings depend on the browser; browsers cannot guarantee protection from crashes or forced shutdowns. Unsaved drafts are not stored.
 - Records are fetched on login, month changes, and **Refresh**. An internet connection is required to save or fetch; there is no offline write queue or real-time subscription.
 - Failed saves keep your inputs. If a response is lost, the server may have committed the save; refresh to confirm the database version before retrying.
-- The **All months** tab lists the take-home netto of every saved month (newest first) with the total and the per-month average. Amounts are computed in the browser from your saved snapshots; click a month to open it in the calculator.
+- The **All months** tab lists the take-home netto of every saved month (newest first) with the total and the per-month average. Amounts are computed in the browser from your saved snapshots; click a month to open it in the calculator. It also shows the average invoice (brutto) across all saved months and a per-year table of average invoice and average netto. Months saved with zero hours have no invoice and are left out of the invoice averages, but still count toward netto averages.
 - A per-user revision prevents stale overwrites from another device. A conflict keeps the draft and asks you to refresh. Copy any draft values you want to keep before accepting a refresh/discard confirmation.
 
 ## Database design

@@ -48,6 +48,10 @@ h2 { font-size: 1.06rem; font-weight: 600; margin-bottom: 0; letter-spacing: -.2
 .earnings-row { display: flex; width: 100%; padding: 14px 10px; background: transparent; border: 0; color: var(--green); text-align: left; font-weight: 550; }
 .earnings-row:hover { background: #f4f7f1; }
 .earnings-table .negative { color: #a22f2f; }
+.earnings-table tbody th { text-align: left; font-weight: 600; padding: 14px 10px; border-bottom: 1px solid var(--border); color: var(--green); }
+.invoice-overall { display: flex; flex-direction: column; gap: 8px; margin: 0 0 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.invoice-overall .eyebrow { color: var(--muted); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (max-width: 720px) { .summary-grid.earnings-summary { grid-template-columns: 1fr; } }
 .panel { border: 1px solid var(--border); border-radius: 16px; background: #fff; padding: 25px; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
